@@ -22,10 +22,12 @@ public class QueueTest extends TestCase {
 		DefaultDisruptorQueue queue = new DefaultDisruptorQueue(512);
 		queue.setName(TipEventListener.QUEUE_NAME);
 		queue.setLogUseTime(false);
-		queue.addEventListener(new TipEventListener(), 5);
+		queue.setEventListener(new TipEventListener());
+		queue.setThreads(5);
 		DefaultDisruptorQueue queue2 = new DefaultDisruptorQueue(512);
 		queue2.setName(HelloEventListener.QUEUE_NAME);
-		queue2.addEventListener(new HelloEventListener(), 3);
+		queue2.setEventListener(new HelloEventListener());
+		queue2.setThreads(3);
 		queueContainer.putQueue(queue);
 		queueContainer.putQueue(queue2);
 		queueContainer.start();

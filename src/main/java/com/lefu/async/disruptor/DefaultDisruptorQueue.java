@@ -33,6 +33,8 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 	private EventTranslatorOneArg<QueueEvent, EventData> translator = TRANSLATOR;
 	private AtomicBoolean isStarted = new AtomicBoolean(false);
 	private String name = DEFAULT_NAME;
+	private int threads = -1;
+	private EventListener eventListener;
 	private boolean logUseTime = false;
 	
 	static {
@@ -80,17 +82,35 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 			return;
 		}
 		if (DEFAULT_NAME.equals(name)) {
-			log.warn("You are named queue with default name, you should give it a new unique name");
+			throw new RuntimeException("You are named queue with default name, you should give it a new unique name");
 		}
-		this.ringBuffer = this.disruptor.start();
+		if (this.threads <= 0) {
+			throw new RuntimeException("Threads must more than 0");
+		}
+		if (this.eventListener == null) {
+			throw new RuntimeException("EventListener must be set");
+		}
 		this.disruptor.handleExceptionsWith(new DefaultExceptionHandler());
+		ProxyWorkHandler[] handlers = new ProxyWorkHandler[threads];
+		for (int i = 0; i < threads; i++) {
+			ProxyWorkHandler handler = new ProxyWorkHandler(this.eventListener, getName());
+			handler.setLogUseTime(logUseTime);
+			handlers[i] = handler;
+		}
+		this.disruptor.handleEventsWithWorkerPool(handlers);
+		log.info("Handler listeners with {} thread in queue {}", threads, getName());
+		this.ringBuffer = this.disruptor.start();
 		isStarted.set(true);
 		log.info("Queue {} started", getName());
 	}
 	
 	@Override
 	public void shutdown() {
+		if (!isStarted.get()) {
+			return;
+		}
 		this.disruptor.shutdown();
+		isStarted.set(false);
 		log.info("Queue {} shutdown", getName());
 	}
 
@@ -100,26 +120,18 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 	}
 	
 	@Override
-	public void addEventListener(EventListener listener, int threads) {
-		if (threads <= 0) {
-			throw new IllegalArgumentException();
-		}
-		if (DEFAULT_NAME.equals(name)) {
-			throw new RuntimeException("You must set queue name before add event listeners");
-		}
-		ProxyWorkHandler[] handlers = new ProxyWorkHandler[threads];
-		for (int i = 0; i < threads; i++) {
-			ProxyWorkHandler handler = new ProxyWorkHandler(listener, getName());
-			handler.setLogUseTime(logUseTime);
-			handlers[i] = handler;
-		}
-		this.disruptor.handleEventsWithWorkerPool(handlers);
-		log.info("Handler listeners with {} thread in queue {}", threads, getName());
+	public boolean hasAvailableCapacity() {
+		return this.ringBuffer.hasAvailableCapacity(DEFAULT_CHECK_CAPACITY);
 	}
 	
 	@Override
-	public boolean hasAvailableCapacity() {
-		return this.ringBuffer.hasAvailableCapacity(DEFAULT_CHECK_CAPACITY);
+	public void setThreads(int threads) {
+		this.threads = threads;
+	}
+	
+	@Override
+	public void setEventListener(EventListener eventListener) {
+		this.eventListener = eventListener;
 	}
 	
 	public void setTranslator(EventTranslatorOneArg<QueueEvent, EventData> translator) {

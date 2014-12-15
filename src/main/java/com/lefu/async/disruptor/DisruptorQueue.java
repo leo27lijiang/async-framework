@@ -20,11 +20,15 @@ public interface DisruptorQueue {
 	 */
 	public void publish(EventData data);
 	/**
-	 * 注册事件监听，并设置多少线程处理事件监听
-	 * @param listener
+	 * 注册事件监听
+	 * @param eventListener
+	 */
+	public void setEventListener(EventListener eventListener);
+	/**
+	 * 设置线程数
 	 * @param threads
 	 */
-	public void addEventListener(EventListener listener, int threads);
+	public void setThreads(int threads);
 	/**
 	 * 检查当前队列是否还有足够的空间
 	 * @see {@link DisruptorQueue#DEFAULT_CHECK_CAPACITY}

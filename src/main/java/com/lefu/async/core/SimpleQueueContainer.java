@@ -2,6 +2,7 @@ package com.lefu.async.core;
 
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -62,6 +63,16 @@ public class SimpleQueueContainer implements QueueContainer {
 			throw new NullPointerException();
 		}
 		this.map.put(queue.getName(), queue);
+	}
+	
+	@Override
+	public void setQueues(List<DisruptorQueue> queues) {
+		if (queues == null) {
+			return;
+		}
+		for (DisruptorQueue q : queues) {
+			putQueue(q);
+		}
 	}
 
 	@Override

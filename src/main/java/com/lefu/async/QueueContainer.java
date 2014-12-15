@@ -1,6 +1,7 @@
 package com.lefu.async;
 
 import java.util.Iterator;
+import java.util.List;
 
 import com.lefu.async.disruptor.DisruptorQueue;
 
@@ -20,6 +21,11 @@ public interface QueueContainer {
 	 * @param queue
 	 */
 	public void putQueue(DisruptorQueue queue);
+	/**
+	 * 
+	 * @param queues
+	 */
+	public void setQueues(List<DisruptorQueue> queues);
 	/**
 	 * 发布数据至指定队列
 	 * @param queueName {@link DisruptorQueue#getName()}
