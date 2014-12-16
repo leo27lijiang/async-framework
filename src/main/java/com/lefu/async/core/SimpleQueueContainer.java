@@ -40,16 +40,21 @@ public class SimpleQueueContainer implements QueueContainer {
 			queue.start();
 		}
 		log.info("Queue container start finished.");
+		isStarted.set(true);
 	}
 	
 	@Override
 	public void shutdown() {
+		if (!isStarted.get()) {
+			return;
+		}
 		Iterator<DisruptorQueue> iter = iterator();
 		while (iter.hasNext()) {
 			DisruptorQueue queue = iter.next();
 			queue.shutdown();
 		}
 		log.info("Queue container shutdown finished.");
+		isStarted.set(false);
 	}
 	
 	@Override
