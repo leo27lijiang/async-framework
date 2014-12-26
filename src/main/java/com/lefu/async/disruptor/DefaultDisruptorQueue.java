@@ -36,7 +36,7 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 	private int threads = -1;
 	private EventListener eventListener;
 	private boolean logUseTime = false;
-	private boolean recordEventStatus;
+	private boolean recordEventStatus = true;
 	
 	static {
 		try {
