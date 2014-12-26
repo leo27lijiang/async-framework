@@ -31,7 +31,7 @@ public interface Flow {
 	 * </pre>
 	 * @param queueName
 	 * @return
-	 * @throws QueueNotFoundException
+	 * @throws QueueNotFoundException 尝试获取不存在的/不记录状态的队列事件处理状态时会抛出异常
 	 */
 	public EventStatus getQueueEventStatus(String queueName) throws QueueNotFoundException;
 	/**

@@ -60,10 +60,7 @@ public class SimpleFlow implements Flow {
 	@Override
 	public void putQueueEventStatus(String queueName, EventStatus status)
 			throws QueueNotFoundException {
-		if (!this.queueEventStatus.containsKey(queueName)) {
-			throw new QueueNotFoundException("Queue not found for name " + queueName);
-		}
-		this.queueEventStatus.put(queueName, status);
+		if(this.queueEventStatus.containsKey(queueName)) this.queueEventStatus.put(queueName, status);
 	}
 
 }

@@ -36,6 +36,7 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 	private int threads = -1;
 	private EventListener eventListener;
 	private boolean logUseTime = false;
+	private boolean recordEventStatus;
 	
 	static {
 		try {
@@ -134,6 +135,11 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 		this.eventListener = eventListener;
 	}
 	
+	@Override
+	public boolean isRecordEventStatus() {
+		return recordEventStatus;
+	}
+	
 	public void setTranslator(EventTranslatorOneArg<QueueEvent, EventData> translator) {
 		this.translator = translator;
 	}
@@ -144,6 +150,10 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 
 	public void setLogUseTime(boolean logUseTime) {
 		this.logUseTime = logUseTime;
+	}
+
+	public void setRecordEventStatus(boolean recordEventStatus) {
+		this.recordEventStatus = recordEventStatus;
 	}
 	
 }

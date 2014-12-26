@@ -15,6 +15,11 @@ public interface DisruptorQueue {
 	 */
 	public String getName();
 	/**
+	 * 当前队列是否记录状态
+	 * @return
+	 */
+	public boolean isRecordEventStatus();
+	/**
 	 * 发布事件，这里发布的是事件的参数，不是事件本身，事件不会在每次发布时新建实例！
 	 * @param data
 	 */
