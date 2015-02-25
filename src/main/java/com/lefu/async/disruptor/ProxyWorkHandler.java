@@ -1,12 +1,17 @@
 package com.lefu.async.disruptor;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lefu.async.EventListener;
 import com.lefu.async.EventStatus;
 import com.lefu.async.Flow;
+import com.lefu.async.PublishPair;
+import com.lefu.async.QueueContainer;
 import com.lefu.async.QueueEvent;
+import com.lefu.async.QueueNotFoundException;
 import com.lmax.disruptor.WorkHandler;
 
 /**
@@ -19,6 +24,7 @@ public class ProxyWorkHandler implements WorkHandler<QueueEvent> {
 	private final EventListener eventListener;
 	private final String queueName;
 	private boolean logUseTime = false;
+	private QueueContainer queueContainer;
 	
 	public ProxyWorkHandler(EventListener listener, String queueName) {
 		this.eventListener = listener;
@@ -31,9 +37,18 @@ public class ProxyWorkHandler implements WorkHandler<QueueEvent> {
 		try {
 			flow.putQueueEventStatus(queueName, EventStatus.STARTED);
 			long start = System.currentTimeMillis();
-			eventListener.onEvent(event);
+			List<PublishPair> events = eventListener.onEvent(event);
 			long end = System.currentTimeMillis();
 			flow.putQueueEventStatus(queueName, EventStatus.FINISHED);
+			if (events != null) {
+				try {
+					for (PublishPair p : events) {
+						this.queueContainer.publish(p.getQueueName(), p.getData());
+					}
+				} catch (QueueNotFoundException qnt) {
+					qnt.printStackTrace();
+				}
+			}
 			if (logUseTime) {
 				log.info(String.format("Event from queue %1$s use time %2$d ms", queueName, (end - start)));
 			}
@@ -51,6 +66,10 @@ public class ProxyWorkHandler implements WorkHandler<QueueEvent> {
 
 	public void setLogUseTime(boolean logUseTime) {
 		this.logUseTime = logUseTime;
+	}
+
+	public void setQueueContainer(QueueContainer queueContainer) {
+		this.queueContainer = queueContainer;
 	}
 
 }

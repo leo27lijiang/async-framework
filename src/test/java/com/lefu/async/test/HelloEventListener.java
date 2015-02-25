@@ -1,9 +1,12 @@
 package com.lefu.async.test;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lefu.async.EventListener;
+import com.lefu.async.PublishPair;
 import com.lefu.async.QueueEvent;
 
 public class HelloEventListener implements EventListener {
@@ -15,9 +18,10 @@ public class HelloEventListener implements EventListener {
 	}
 	
 	@Override
-	public void onEvent(QueueEvent e) throws Exception {
+	public List<PublishPair> onEvent(QueueEvent e) throws Exception {
 		HelloEventData data = (HelloEventData)e.getEventData();
 		log.info("Get data message {}", data.getMessage());
+		return null;
 	}
 
 }

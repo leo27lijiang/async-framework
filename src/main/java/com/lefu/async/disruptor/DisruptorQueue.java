@@ -2,6 +2,7 @@ package com.lefu.async.disruptor;
 
 import com.lefu.async.EventData;
 import com.lefu.async.EventListener;
+import com.lefu.async.QueueContainer;
 
 /**
  * 队列定义
@@ -29,6 +30,11 @@ public interface DisruptorQueue {
 	 * @param eventListener
 	 */
 	public void setEventListener(EventListener eventListener);
+	/**
+	 * 关联容器
+	 * @param queueContainer
+	 */
+	public void setQueueContainer(QueueContainer queueContainer);
 	/**
 	 * 设置线程数
 	 * @param threads

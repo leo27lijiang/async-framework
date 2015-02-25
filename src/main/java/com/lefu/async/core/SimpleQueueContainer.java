@@ -67,6 +67,7 @@ public class SimpleQueueContainer implements QueueContainer {
 		if (queue == null) {
 			throw new NullPointerException();
 		}
+		queue.setQueueContainer(this);
 		this.map.put(queue.getName(), queue);
 	}
 	

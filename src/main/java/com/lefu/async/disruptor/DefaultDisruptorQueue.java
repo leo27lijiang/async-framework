@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.lefu.async.EventData;
 import com.lefu.async.EventListener;
+import com.lefu.async.QueueContainer;
 import com.lefu.async.QueueEvent;
 import com.lefu.async.support.ThreadPoolFactory;
 import com.lmax.disruptor.EventFactory;
@@ -37,6 +38,7 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 	private EventListener eventListener;
 	private boolean logUseTime = false;
 	private boolean recordEventStatus = true;
+	private QueueContainer queueContainer;
 	
 	static {
 		try {
@@ -91,10 +93,14 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 		if (this.eventListener == null) {
 			throw new RuntimeException("EventListener must be set");
 		}
+		if (this.queueContainer == null) {
+			throw new RuntimeException("QueueContainer must not be null");
+		}
 		this.disruptor.handleExceptionsWith(new DefaultExceptionHandler());
 		ProxyWorkHandler[] handlers = new ProxyWorkHandler[threads];
 		for (int i = 0; i < threads; i++) {
 			ProxyWorkHandler handler = new ProxyWorkHandler(this.eventListener, getName());
+			handler.setQueueContainer(queueContainer);
 			handler.setLogUseTime(logUseTime);
 			handlers[i] = handler;
 		}
@@ -138,6 +144,11 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 	@Override
 	public boolean isRecordEventStatus() {
 		return recordEventStatus;
+	}
+	
+	@Override
+	public void setQueueContainer(QueueContainer queueContainer) {
+		this.queueContainer = queueContainer;
 	}
 	
 	public void setTranslator(EventTranslatorOneArg<QueueEvent, EventData> translator) {
