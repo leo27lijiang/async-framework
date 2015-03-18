@@ -17,11 +17,7 @@ public class TipEventListener implements EventListener {
 	@Override
 	public List<PublishPair> onEvent(QueueEvent e) throws Exception {
 		TipEventData data = (TipEventData) e.getEventData();
-		Thread.sleep(15);
-		log.info("Get data message {}", data.getMessage());
-		if (data.getMessage().startsWith("10")) {
-			throw new RuntimeException();
-		}
+//		log.info("Get data message {}", data.getMessage());
 		HelloEventData second = new HelloEventData(data.getFlow());
 		second.setMessage("-->" + data.getMessage());
 		List<PublishPair> events = new ArrayList<PublishPair>();

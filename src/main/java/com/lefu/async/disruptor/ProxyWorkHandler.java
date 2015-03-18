@@ -61,6 +61,8 @@ public class ProxyWorkHandler implements WorkHandler<QueueEvent> {
 			} catch (Exception q) {
 				q.printStackTrace();
 			}
+		} finally {
+			event.setEventData(null);//Clean event data reference
 		}
 	}
 

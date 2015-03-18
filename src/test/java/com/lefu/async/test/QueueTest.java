@@ -19,15 +19,15 @@ public class QueueTest extends TestCase {
 	@Before
 	public void setUp() {
 		queueContainer = new SimpleQueueContainer();
-		DefaultDisruptorQueue queue = new DefaultDisruptorQueue(512);
+		DefaultDisruptorQueue queue = new DefaultDisruptorQueue(262144);
 		queue.setName(TipEventListener.QUEUE_NAME);
 		queue.setLogUseTime(false);
 		queue.setEventListener(new TipEventListener());
-		queue.setThreads(5);
-		DefaultDisruptorQueue queue2 = new DefaultDisruptorQueue(512);
+		queue.setThreads(30);
+		DefaultDisruptorQueue queue2 = new DefaultDisruptorQueue(262144);
 		queue2.setName(HelloEventListener.QUEUE_NAME);
 		queue2.setEventListener(new HelloEventListener());
-		queue2.setThreads(3);
+		queue2.setThreads(50);
 		queueContainer.putQueue(queue);
 		queueContainer.putQueue(queue2);
 		queueContainer.start();
@@ -35,13 +35,14 @@ public class QueueTest extends TestCase {
 	
 	@Test
 	public void testQueue() throws InterruptedException {
-		for (int i = 0; i < 5; i++) {
+		Thread.sleep(15000);
+		for (int i = 0; i < 500000; i++) {
 			Flow flow = queueContainer.startFlow();
 			TipEventData data = new TipEventData(flow);
 			data.setMessage(UUID.randomUUID().toString());
 			while (!queueContainer.hasAvailableCapacity(TipEventListener.QUEUE_NAME)) {
-				System.out.println(Thread.currentThread().getName() + " - " + "Sleep 10 ms");
-				Thread.sleep(10);
+				System.out.println(Thread.currentThread().getName() + " - " + "Sleep 1 ms");
+				Thread.sleep(1);
 			}
 			queueContainer.publish(TipEventListener.QUEUE_NAME, data);
 		}
