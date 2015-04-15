@@ -27,4 +27,9 @@ public class SimpleFlowContext implements FlowContext {
 		return this.map.get(key);
 	}
 
+	@Override
+	public void destroy() {
+		this.map.clear();
+	}
+
 }

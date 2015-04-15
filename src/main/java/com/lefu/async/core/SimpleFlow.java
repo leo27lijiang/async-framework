@@ -60,7 +60,14 @@ public class SimpleFlow implements Flow {
 	@Override
 	public void putQueueEventStatus(String queueName, EventStatus status)
 			throws QueueNotFoundException {
+		if (status.equals(EventStatus.UNKOWN)) throw new RuntimeException("Can not set status to UNKOWN, it is a special state"); 
 		if(this.queueEventStatus.containsKey(queueName)) this.queueEventStatus.put(queueName, status);
+	}
+
+	@Override
+	public void destroy() {
+		this.queueEventStatus.clear();
+		this.flowContext.destroy();
 	}
 
 }

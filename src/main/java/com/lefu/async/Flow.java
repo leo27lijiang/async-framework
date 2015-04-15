@@ -5,7 +5,7 @@ package com.lefu.async;
  * @author jiang.li
  *
  */
-public interface Flow {
+public interface Flow extends Destroy {
 	/**
 	 * 获取流程ID
 	 * @return
@@ -36,6 +36,7 @@ public interface Flow {
 	public EventStatus getQueueEventStatus(String queueName) throws QueueNotFoundException;
 	/**
 	 * 更新事件处理状态
+	 * <pre>不要调用这个方法，状态设置是框架内部使用的</pre>
 	 * @param queueName
 	 * @param status
 	 * @throws QueueNotFoundException

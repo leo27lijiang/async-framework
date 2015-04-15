@@ -1,5 +1,6 @@
 package com.lefu.async.disruptor;
 
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -37,8 +38,9 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 	private int threads = -1;
 	private EventListener eventListener;
 	private boolean logUseTime = false;
-	private boolean recordEventStatus = true;
 	private QueueContainer queueContainer;
+	private List<String> dependents;
+	private String exceptionQueue;
 	
 	static {
 		try {
@@ -84,6 +86,9 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 		if (isStarted.get()) {
 			return;
 		}
+		if (name == null) {
+			throw new NullPointerException("Queue name can not be null");
+		}
 		if (DEFAULT_NAME.equals(name)) {
 			throw new RuntimeException("You are named queue with default name, you should give it a new unique name");
 		}
@@ -96,12 +101,19 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 		if (this.queueContainer == null) {
 			throw new RuntimeException("QueueContainer must not be null");
 		}
+		if (this.dependents != null) {
+			for (String n : dependents) {
+				if (n.equals(name)) {
+					throw new RuntimeException("Queue can not denpend itself");
+				}
+			}
+		}
 		this.disruptor.handleExceptionsWith(new DefaultExceptionHandler());
 		ProxyWorkHandler[] handlers = new ProxyWorkHandler[threads];
 		for (int i = 0; i < threads; i++) {
-			ProxyWorkHandler handler = new ProxyWorkHandler(this.eventListener, getName());
-			handler.setQueueContainer(queueContainer);
+			ProxyWorkHandler handler = new ProxyWorkHandler(this.eventListener, getName(), exceptionQueue);
 			handler.setLogUseTime(logUseTime);
+			handler.setDependents(dependents);
 			handlers[i] = handler;
 		}
 		this.disruptor.handleEventsWithWorkerPool(handlers);
@@ -118,6 +130,9 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 		}
 		this.disruptor.shutdown();
 		isStarted.set(false);
+		if (this.eventListener != null) {
+			this.eventListener.destroy();
+		}
 		log.info("Queue {} shutdown", getName());
 	}
 
@@ -132,6 +147,11 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 	}
 	
 	@Override
+	public boolean hasDependents() {
+		return this.dependents != null;
+	}
+	
+	@Override
 	public void setThreads(int threads) {
 		this.threads = threads;
 	}
@@ -139,11 +159,6 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 	@Override
 	public void setEventListener(EventListener eventListener) {
 		this.eventListener = eventListener;
-	}
-	
-	@Override
-	public boolean isRecordEventStatus() {
-		return recordEventStatus;
 	}
 	
 	@Override
@@ -155,6 +170,16 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 		this.translator = translator;
 	}
 
+	@Override
+	public void setDependents(List<String> dependents) {
+		this.dependents = dependents;
+	}
+	
+	@Override
+	public void setExceptionQuene(String queueName) {
+		this.exceptionQueue = queueName;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -163,8 +188,4 @@ public class DefaultDisruptorQueue implements DisruptorQueue {
 		this.logUseTime = logUseTime;
 	}
 
-	public void setRecordEventStatus(boolean recordEventStatus) {
-		this.recordEventStatus = recordEventStatus;
-	}
-	
 }

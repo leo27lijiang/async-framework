@@ -7,12 +7,13 @@ import java.util.List;
  * @author jiang.li
  *
  */
-public interface EventListener {
+public interface EventListener extends Destroy {
 	/**
 	 * 事件处理
 	 * @param e
-	 * @return 返回的待分发事件列表，默认会按照列表的顺序分发事件到对应的队列中去，如果为null则不进行分发
+	 * @param futureList 待分发事件列表，默认会按照列表的添加顺序分发事件到对应的队列中去
 	 * @throws Exception
 	 */
-	public List<PublishPair> onEvent(QueueEvent e) throws Exception;
+	public void onEvent(QueueEvent e, List<PublishPair> futureList) throws Exception;
+	
 }

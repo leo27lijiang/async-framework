@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import com.lefu.async.Flow;
 import com.lefu.async.QueueContainer;
 import com.lefu.async.QueueNotFoundException;
 import com.lefu.async.disruptor.DisruptorQueue;
+import com.lefu.async.util.SimpleUtil;
 
 /**
  * 队列容器基础实现
@@ -59,7 +61,15 @@ public class SimpleQueueContainer implements QueueContainer {
 	
 	@Override
 	public Flow startFlow() {
-		return new SimpleFlow(this);
+		Flow flow = new SimpleFlow(this);
+		Iterator<DisruptorQueue> iter = iterator();
+		while (iter.hasNext()) {
+			DisruptorQueue next = iter.next();
+			if (next.hasDependents()) {
+				flow.getContext().putAttr(SimpleUtil.generateKeyByQueueName(next.getName()), new ReentrantLock());//Create an object for lock
+			}
+		}
+		return flow;
 	}
 	
 	@Override

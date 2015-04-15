@@ -3,17 +3,17 @@ package com.lefu.async.test;
 import com.lefu.async.AbstractEventData;
 import com.lefu.async.Flow;
 
-public class HelloEventData extends AbstractEventData {
+public class SecondEventData extends AbstractEventData {
 	private String message;
 	
-	public HelloEventData() {
+	public SecondEventData() {
 		
 	}
 	
-	public HelloEventData(Flow flow) {
+	public SecondEventData(Flow flow) {
 		setFlow(flow);
 	}
-	
+
 	public String getMessage() {
 		return message;
 	}
@@ -21,5 +21,5 @@ public class HelloEventData extends AbstractEventData {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-
+	
 }

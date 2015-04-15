@@ -5,7 +5,7 @@ package com.lefu.async;
  * @author jiang.li
  *
  */
-public interface FlowContext {
+public interface FlowContext extends Destroy {
 	/**
 	 * 
 	 * @param key
