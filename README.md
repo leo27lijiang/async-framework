@@ -7,3 +7,6 @@ async-framework提供了流程和队列的概念，流程 Flow 代表步骤，�
 # 用法
 
 参考测试用例 com.lefu.async.test.QueueTest
+
+# wiki
+https://github.com/leo27lijiang/async-framework/wiki
